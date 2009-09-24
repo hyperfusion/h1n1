@@ -4,7 +4,7 @@ public class VM {
     // builtin functions
     static class Builtin {
         // too bad enums can't extend anything else, so we'll fake it here
-        public static final ELambdaBuiltin PLUS, MINUS, MULTIPLY, DIVIDE, MOD, LESS, GREATER, LEQ, GEQ, EQ, QUOTE, IF, DEFINE, LAMBDA, CONS, CAR, CDR, NULLQ;
+        public static final ELambdaBuiltin PLUS, MINUS, MULTIPLY, DIVIDE, MOD, LESS, GREATER, LEQ, GEQ, EQ, QUOTE, IF, DEFINE, LAMBDA, CONS, CAR, CDR, EQV, EQUAL;
         static {
             PLUS     = new ELambdaBuiltin("+", 2);
             MINUS    = new ELambdaBuiltin("-", 1);
@@ -23,10 +23,11 @@ public class VM {
             CONS     = new ELambdaBuiltin("cons", 2);
             CAR      = new ELambdaBuiltin("car", 1);
             CDR      = new ELambdaBuiltin("cdr", 1);
-            NULLQ    = new ELambdaBuiltin("null?", 1);
+            EQV      = new ELambdaBuiltin("eqv?", 2);
+            EQUAL    = new ELambdaBuiltin("equal?", 2);
         }
         public static ELambdaBuiltin[] all() {
-            return new ELambdaBuiltin[] { PLUS, MINUS, MULTIPLY, DIVIDE, MOD, LESS, GREATER, LEQ, GEQ, EQ, QUOTE, IF, DEFINE, LAMBDA, CONS, CAR, CDR, NULLQ };
+            return new ELambdaBuiltin[] { PLUS, MINUS, MULTIPLY, DIVIDE, MOD, LESS, GREATER, LEQ, GEQ, EQ, QUOTE, IF, DEFINE, LAMBDA, CONS, CAR, CDR, EQV, EQUAL };
         }
     }
 
@@ -228,11 +229,21 @@ public class VM {
             return EList.cast(eval(args.get(0), env)).cdr;
         }
 
-        if (f == Builtin.NULLQ) {
-            if (args.size() != 1)
-                throw new RuntimeException("expected 1 arg to null?");
-            return eval(args.get(0), env) == EList.NULL ? EBool.TRUE : EBool.FALSE;
+        if (f == Builtin.EQV) {
+            if (args.size() != 2)
+                throw new RuntimeException("expected 2 args to eqv?");
+            Expr a = eval(args.get(0), env), b = eval(args.get(1), env);
+            if (!a.getClass().equals(b.getClass()))
+                return EBool.FALSE;
+            return a.equals(b) ? EBool.TRUE : EBool.FALSE;
         }
+
+        if (f == Builtin.EQUAL) {
+            if (args.size() != 2)
+                throw new RuntimeException("expected 2 args to equal?");
+            return eval(args.get(0), env).toString().equals(eval(args.get(1), env).toString()) ? EBool.TRUE : EBool.FALSE;
+        }
+
         return null;
     }
 

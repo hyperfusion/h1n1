@@ -1,6 +1,7 @@
 import java.util.*;
 
 public abstract class Expr {
+    public abstract boolean equals(Object o);
     public abstract String toString();
 }
 
@@ -8,6 +9,8 @@ class EList extends Expr {
     public Expr car;
     public EList cdr;
     public EList(Expr car, EList cdr) { this.car = car; this.cdr = cdr; }
+
+    public boolean equals(Object o) { return (EList) o == this; }
 
     public String toString() {
         StringBuilder sb = new StringBuilder("(");
@@ -32,7 +35,6 @@ class EList extends Expr {
         }
         public void remove() { throw new UnsupportedOperationException(); }
     }
-
     public Iterator<Expr> iterator() { return new EListIterator(this); }
 
     public List<Expr> toList() {
@@ -58,6 +60,8 @@ class EList extends Expr {
 class EAtom extends Expr {
     public String val;
     public EAtom(String val) { this.val = val; }
+    public boolean equals(Object o) { return ((EAtom) o).val.equals(val); }
+    public int hashCode() { return val.hashCode(); }
     public String toString() { return val; }
 
     public static EAtom cast(Expr e) {
@@ -65,9 +69,6 @@ class EAtom extends Expr {
             throw new RuntimeException(e.toString() + " is not an atom");
         return (EAtom) e;
     }
-
-    public boolean equals(Object o) { return ((EAtom) o).val.equals(val); }
-    public int hashCode() { return val.hashCode(); }
 
     // this NIL is used for everything except list termination
     /*public static final EAtom NIL;
@@ -79,6 +80,7 @@ class EAtom extends Expr {
 class ENum extends Expr {
     public double val;
     public ENum(double val) { this.val = val; }
+    public boolean equals(Object o) { return ((ENum) o).val == val; }
     public String toString() { return Double.toString(val); }
 
     public static ENum cast(Expr e) {
@@ -91,6 +93,7 @@ class ENum extends Expr {
 class EString extends Expr {
     public String val;
     public EString(String val) { this.val = val; }
+    public boolean equals(Object o) { return ((EString) o).val == val; }
     public String toString() { return "\"" + val + "\""; }
 
     public static EString cast(Expr e) {
@@ -103,6 +106,7 @@ class EString extends Expr {
 class EBool extends Expr {
     public boolean val;
     public EBool(boolean val) { this.val = val; }
+    public boolean equals(Object o) { return ((EBool) o).val == val; }
     public String toString() { return val ? "#t" : "#f"; }
 
     public static EBool cast(Expr e) {
@@ -123,6 +127,7 @@ class ELambda extends Expr {
     List<Expr> body;
     VM.Environment env;
     public ELambda(List<EAtom> args, List<Expr> body, VM.Environment env) { this.args = args; this.body = body; this.env = env; }
+    public boolean equals(Object o) { return ((ELambda) o) == this; }
     public String toString() {
         return "(lambda (" + args.size() +  (args.size() == 1 ? " arg" : " args") + ") (...))";
     }
