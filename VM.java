@@ -4,7 +4,7 @@ public class VM {
     // builtin functions
     static class Builtin {
         // too bad enums can't extend anything else, so we'll fake it here
-        public static final ELambdaBuiltin PLUS, MINUS, MULTIPLY, DIVIDE, MOD, LESS, GREATER, LEQ, GEQ, EQ, QUOTE, IF, DEFINE, LAMBDA, CONS, CAR, CDR, EQV, EQUAL;
+        public static final ELambdaBuiltin PLUS, MINUS, MULTIPLY, DIVIDE, MOD, LESS, GREATER, LEQ, GEQ, EQ, QUOTE, IF, DEFINE, LAMBDA, LIST, CONS, CAR, CDR, EQV, EQUAL;
         static {
             PLUS     = new ELambdaBuiltin("+", 2);
             MINUS    = new ELambdaBuiltin("-", 1);
@@ -20,6 +20,7 @@ public class VM {
             IF       = new ELambdaBuiltin("if", 3);
             DEFINE   = new ELambdaBuiltin("define", 2);
             LAMBDA   = new ELambdaBuiltin("lambda", 2);
+            LIST     = new ELambdaBuiltin("list", 1);
             CONS     = new ELambdaBuiltin("cons", 2);
             CAR      = new ELambdaBuiltin("car", 1);
             CDR      = new ELambdaBuiltin("cdr", 1);
@@ -27,7 +28,7 @@ public class VM {
             EQUAL    = new ELambdaBuiltin("equal?", 2);
         }
         public static ELambdaBuiltin[] all() {
-            return new ELambdaBuiltin[] { PLUS, MINUS, MULTIPLY, DIVIDE, MOD, LESS, GREATER, LEQ, GEQ, EQ, QUOTE, IF, DEFINE, LAMBDA, CONS, CAR, CDR, EQV, EQUAL };
+            return new ELambdaBuiltin[] { PLUS, MINUS, MULTIPLY, DIVIDE, MOD, LESS, GREATER, LEQ, GEQ, EQ, QUOTE, IF, DEFINE, LAMBDA, LIST, CONS, CAR, CDR, EQV, EQUAL };
         }
     }
 
@@ -210,7 +211,17 @@ public class VM {
 
             return new ELambda(largs, args, env);
         }
-        
+
+        if (f == Builtin.LIST) {
+            EList list = new EList(eval(args.get(0), env), EList.NULL), pos = list;
+            args.remove(0);
+            for (Expr arg : args) {
+                pos.cdr = new EList(eval(arg, env), EList.NULL);
+                pos = pos.cdr;
+            }
+            return list;
+        }
+
         if (f == Builtin.CONS) {
             if (args.size() != 2)
                 throw new RuntimeException("expected = 2 args to cons");
