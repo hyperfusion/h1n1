@@ -127,7 +127,7 @@ class ELambda extends Expr {
     List<Expr> body;
     VM.Environment env;
     public ELambda(List<EAtom> args, List<Expr> body, VM.Environment env) { this.args = args; this.body = body; this.env = env; }
-    public boolean equals(Object o) { return ((ELambda) o) == this; }
+    public boolean equals(Object o) { return (ELambda) o == this; }
     public String toString() {
         return "(lambda (" + args.size() +  (args.size() == 1 ? " arg" : " args") + ") (...))";
     }
