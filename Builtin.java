@@ -29,13 +29,13 @@ public class Builtin {
     }
 
     public static Expr call(ELambdaBuiltin f, List<Expr> args, VM vm, VM.Environment env) {
-        if (f == Builtin.QUOTE) {
+        if (f == QUOTE) {
             if (args.size() != 1)
                 throw new RuntimeException("expected 1 arg to quote");
             return args.get(0);
         }
 
-        if (f == Builtin.PLUS) {
+        if (f == PLUS) {
             double d = 0.0;
             Iterator<Expr> i = args.iterator();
             while (i.hasNext())
@@ -43,7 +43,7 @@ public class Builtin {
             return new ENum(d);
         }
 
-        if (f == Builtin.MINUS) {
+        if (f == MINUS) {
             if (args.size() == 1)
                 return new ENum(-ENum.cast(vm.eval(args.get(0), env)).val);
             if (args.size() == 2)
@@ -51,7 +51,7 @@ public class Builtin {
             throw new RuntimeException("expected 1 or 2 args to -");
         }
 
-        if (f == Builtin.MULTIPLY) {
+        if (f == MULTIPLY) {
             double d = 1.0;
             Iterator<Expr> i = args.iterator();
             while (i.hasNext())
@@ -59,7 +59,7 @@ public class Builtin {
             return new ENum(d);
         }
 
-        if (f == Builtin.DIVIDE) {
+        if (f == DIVIDE) {
             if (args.size() == 1)
                 return new ENum(1.0 / ENum.cast(vm.eval(args.get(0), env)).val);
             if (args.size() == 2)
@@ -67,56 +67,56 @@ public class Builtin {
             throw new RuntimeException("expected 1 or 2 args to /");
         }
 
-        if (f == Builtin.MOD) {
+        if (f == MOD) {
             if (args.size() != 2)
                 throw new RuntimeException("expected 2 args to %");
             return new ENum(ENum.cast(vm.eval(args.get(0), env)).val % ENum.cast(vm.eval(args.get(1), env)).val);
         }
 
-        if (f == Builtin.LESS) {
+        if (f == LESS) {
             if (args.size() != 2)
                 throw new RuntimeException("expected 2 args to <");
             return ENum.cast(vm.eval(args.get(0), env)).val < ENum.cast(vm.eval(args.get(1), env)).val ? EBool.TRUE : EBool.FALSE;
         }
 
-        if (f == Builtin.GREATER) {
+        if (f == GREATER) {
             if (args.size() != 2)
                 throw new RuntimeException("expected 2 args to >");
             return ENum.cast(vm.eval(args.get(0), env)).val > ENum.cast(vm.eval(args.get(1), env)).val ? EBool.TRUE : EBool.FALSE;
         }
 
-        if (f == Builtin.LEQ) {
+        if (f == LEQ) {
             if (args.size() != 2)
                 throw new RuntimeException("expected 2 args to <=");
             return ENum.cast(vm.eval(args.get(0), env)).val <= ENum.cast(vm.eval(args.get(1), env)).val ? EBool.TRUE : EBool.FALSE;
         }
 
-        if (f == Builtin.GEQ) {
+        if (f == GEQ) {
             if (args.size() != 2)
                 throw new RuntimeException("expected 2 args to >=");
             return ENum.cast(vm.eval(args.get(0), env)).val >= ENum.cast(vm.eval(args.get(1), env)).val ? EBool.TRUE : EBool.FALSE;
         }
 
-        if (f == Builtin.EQ) {
+        if (f == EQ) {
             if (args.size() != 2)
                 throw new RuntimeException("expected 2 args to =");
             return ENum.cast(vm.eval(args.get(0), env)).val == ENum.cast(vm.eval(args.get(1), env)).val ? EBool.TRUE : EBool.FALSE;
         }
 
-        if (f == Builtin.IF) {
+        if (f == IF) {
             if (args.size() != 3)
                 throw new RuntimeException("expected 3 args to if");
             return EBool.cast(vm.eval(args.get(0), env)).val ? vm.eval(args.get(1), env) : vm.eval(args.get(2), env);
         }
 
-        if (f == Builtin.DEFINE) {
+        if (f == DEFINE) {
             if (args.size() != 2)
                 throw new RuntimeException("expected 2 args to define");
             env.put(EAtom.cast(args.get(0)), vm.eval(args.get(1), env));
             return null;
         }
 
-        if (f == Builtin.LAMBDA) {
+        if (f == LAMBDA) {
             if (args.size() < 2)
                 throw new RuntimeException("expected >= 2 args to lambda");
 
@@ -131,7 +131,7 @@ public class Builtin {
             return new ELambda(largs, args, env);
         }
 
-        if (f == Builtin.LIST) {
+        if (f == LIST) {
             EList list = new EList(vm.eval(args.get(0), env), EList.NULL), pos = list;
             args.remove(0);
             for (Expr arg : args) {
@@ -141,25 +141,25 @@ public class Builtin {
             return list;
         }
 
-        if (f == Builtin.CONS) {
+        if (f == CONS) {
             if (args.size() != 2)
                 throw new RuntimeException("expected = 2 args to cons");
             return new EList(vm.eval(args.get(0), env), EList.cast(vm.eval(args.get(1), env)));
         }
 
-        if (f == Builtin.CAR) {
+        if (f == CAR) {
             if (args.size() != 1)
                 throw new RuntimeException("expected 1 arg to car");
             return EList.cast(vm.eval(args.get(0), env)).car;
         }
 
-        if (f == Builtin.CDR) {
+        if (f == CDR) {
             if (args.size() != 1)
                 throw new RuntimeException("expected 1 arg to cdr");
             return EList.cast(vm.eval(args.get(0), env)).cdr;
         }
 
-        if (f == Builtin.EQV) {
+        if (f == EQV) {
             if (args.size() != 2)
                 throw new RuntimeException("expected 2 args to eqv?");
             Expr a = vm.eval(args.get(0), env), b = vm.eval(args.get(1), env);
@@ -168,7 +168,7 @@ public class Builtin {
             return a.equals(b) ? EBool.TRUE : EBool.FALSE;
         }
 
-        if (f == Builtin.EQUAL) {
+        if (f == EQUAL) {
             if (args.size() != 2)
                 throw new RuntimeException("expected 2 args to equal?");
             return vm.eval(args.get(0), env).toString().equals(vm.eval(args.get(1), env).toString()) ? EBool.TRUE : EBool.FALSE;
